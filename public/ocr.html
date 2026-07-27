@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Casa Mestres · Entrada directa de productes OCR</title>
+<script src="/vendor/tesseract/tesseract.min.js"></script>
+<style>
+:root{--paper:#fffdf8;--ink:#17372f;--green:#287a57;--gold:#8b5a20;--red:#a3342f;--border:#d9c9ae;--bg:#f3eee4}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#ede4d4,#f8f4ec);color:#242424}header{background:linear-gradient(120deg,#17372f,#275849);color:#fff;padding:20px 24px}h1{font-family:Georgia,serif;margin:0;font-size:clamp(24px,4vw,38px)}header p{margin:7px 0 0}.wrap{max-width:1450px;margin:20px auto;padding:0 14px 50px}.notice{background:#fff6d9;border:1px solid #d8b35c;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-weight:700}.grid{display:grid;grid-template-columns:minmax(330px,.8fr) minmax(600px,1.5fr);gap:18px;align-items:start}.card{background:var(--paper);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:18px;box-shadow:0 10px 26px rgba(47,36,22,.10)}h2{font-family:Georgia,serif;color:var(--ink);margin:0 0 12px}.drop{border:2px dashed #9e8765;border-radius:14px;padding:14px;background:#fbf7ef}.drop input{width:100%}#previewWrap{margin-top:12px;min-height:240px;background:#e8e3da;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden}#preview{display:none;max-width:100%;max-height:580px}.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.btn,button{border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer;background:var(--ink);color:#fff;text-decoration:none;font-size:14px}.green{background:var(--green)}.gold{background:var(--gold)}.light{background:#e9dfce;color:#222}.red{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed}.status{border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;margin-top:12px}.status strong{display:block;margin-bottom:6px}progress{width:100%}.small{font-size:13px;color:#5a5a5a;line-height:1.4}.table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th{background:#e8dcc8;color:#253d36;text-align:left;padding:8px;border:1px solid #cdbb9e;white-space:nowrap}td{border:1px solid #ddd1bd;padding:5px;vertical-align:top}td input,td select{width:100%;min-width:90px;border:0;background:#fff;padding:7px}td.name input{min-width:230px}.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:#e9e2d6;font-size:12px;font-weight:800}.empty{padding:16px;color:#777;font-style:italic}.result{margin-top:12px;border-radius:10px;padding:12px;background:#eef7f1;border:1px solid #9bc7ad}.result.error{background:#f8e6e4;border-color:#d99b96}textarea{width:100%;min-height:110px;border:1px solid var(--border);border-radius:10px;padding:10px;font-family:Consolas,monospace}.topbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.auto-note{font-size:12px;color:#555}.check{width:20px;height:20px}@media(max-width:980px){.grid{grid-template-columns:1fr}}@media(max-width:650px){.wrap{padding:0 8px 35px}.card{padding:10px}table{font-size:12px}}
+</style>
+</head>
+<body>
+<header><h1>ENTRADA DIRECTA DE PRODUCTES · OCR</h1><p>Producte = codi + nom + preu + família. Sense crear proveïdors, factures ni albarans.</p></header>
+<div class="wrap">
+  <div class="notice">Flux únic: <b>tria la fotografia → LLEGIR → revisa les línies → CREA PRODUCTES AL MAGATZEM.</b> El codi i la família es proposen automàticament i els pots corregir.</div>
+  <div class="topbar"><a class="btn gold" href="/#products">← Tornar a Productes / Magatzem</a></div>
+  <div class="grid">
+    <section>
+      <div class="card">
+        <h2>1 · Fotografia</h2>
+        <div id="drop" class="drop"><input id="fileInput" type="file" accept="image/jpeg,image/png,image/webp"><p class="small">JPG, PNG o WEBP. Només una vegada.</p></div>
+        <div id="previewWrap"><span id="previewHint">Cap imatge carregada</span><img id="preview" alt="Document"></div>
+        <div class="controls"><button id="leftBtn" class="light" disabled>↶ Girar</button><button id="rightBtn" class="light" disabled>↷ Girar</button></div>
+        <label class="small"><input id="enhance" type="checkbox" checked> Millorar contrast</label>
+        <button id="readBtn" class="green" style="width:100%;margin-top:12px" disabled>LLEGIR PRODUCTES</button>
+        <div class="status"><strong id="statusText">Esperant imatge</strong><progress id="progress" max="100" value="0"></progress><div id="statusDetail" class="small">Motor OCR local incorporat.</div></div>
+      </div>
+      <div class="card">
+        <h2>Text OCR</h2>
+        <textarea id="rawText" placeholder="Text detectat"></textarea>
+        <div class="controls"><button id="analyzeBtn" class="gold">TORNAR A ANALITZAR</button><button id="clearBtn" class="light">Netejar</button></div>
+      </div>
+    </section>
+    <section>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2>2 · Productes detectats</h2><span id="countPill" class="pill">0 línies</span></div>
+        <p class="auto-note">La família es decideix pel nom del producte, no pel proveïdor. Per exemple, “lluç” → Peixos i marisc; “rotlle paper higiènic” → Paper i consumibles.</p>
+        <div class="controls"><button id="addBtn" class="light">+ Afegir producte</button><button id="reclassBtn" class="light">Reclassificar famílies</button></div>
+        <div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>✓</th><th>Codi</th><th>Producte</th><th>Unitat</th><th>Preu compra</th><th>Família</th><th>Subfamília</th><th></th></tr></thead><tbody id="rowsBody"><tr><td colspan="8" class="empty">Encara no hi ha productes.</td></tr></tbody></table></div>
+      </div>
+      <div class="card">
+        <h2>3 · Crear al magatzem</h2>
+        <p class="small">Si el producte ja existeix amb el mateix nom, actualitza el preu i la família. Si és nou, crea el codi intern automàtic.</p>
+        <button id="saveBtn" class="green" style="width:100%" disabled>CREAR PRODUCTES AL MAGATZEM</button>
+        <div id="saveResult"></div>
+      </div>
+    </section>
+  </div>
+</div>
+<canvas id="canvas" style="display:none"></canvas>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);let originalImage=null,rotation=0,worker=null,items=[],state={products:[]},sourceInboxId='';
+let families=['Peixos i marisc','Carns','Verdures i hortalisses','Fruites','Làctics i ous','Secs i rebost','Begudes','Neteja','Paper i consumibles','Bases de cuina','Altres'];
+let prefixes={'Peixos i marisc':'PEI','Carns':'CAR','Verdures i hortalisses':'VER','Fruites':'FRU','Làctics i ous':'LAC','Secs i rebost':'SEC','Begudes':'BEG','Neteja':'NET','Paper i consumibles':'PAP','Bases de cuina':'BAS','Altres':'ALT'};
+function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function nnum(v){if(v===null||v===undefined||v==='')return null;let s=String(v).trim().replace(/\s/g,'');if(s.includes(',')&&s.includes('.')){if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');else s=s.replace(/,/g,'')}else s=s.replace(',','.');s=s.replace(/[^\d.-]/g,'');const n=Number(s);return Number.isFinite(n)?n:null}
+function guessFamily(name){const s=norm(name);const has=(re)=>re.test(s);
+ if(has(/paper higien|rotlle|bobina|tovallo|film|alumini|paper forn|escuradent|safata|got de plastic|plat de plastic|bossa escombr|guant d'un sol us|consumible/))return 'Paper i consumibles';
+ if(has(/detergent|lleixiu|desgreix|rentavaix|sabo|netejador|desinfect|abrillantador|esponja|fregall|neteja/))return 'Neteja';
+ if(has(/lluc|bacalla|rap|salmo|tonyina|sardina|anxov|seito|calamar|sepia|pop|gamba|llagosti|musclo|cloissa|ostre|peix|marisc/))return 'Peixos i marisc';
+ if(has(/vedella|vaca|bou|porc|xai|corder|pollastre|gallina|anec|conill|entrecot|chuleton|hamburg|botifarr|xistorra|pernil|carn/))return 'Carns';
+ if(has(/patata|ceba|all\b|tomaquet|pebrot|enciam|carbasso|albergin|pastanaga|porro|mongeta|espinac|bolet|verdura|hortalissa|api\b|col\b/))return 'Verdures i hortalisses';
+ if(has(/poma|pera|taronja|llimona|maduix|platan|mel[oó]|sindria|pinya|fruita/))return 'Fruites';
+ if(has(/llet|nata|mantega|formatge|iogurt|ou\b|ous\b|lactic/))return 'Làctics i ous';
+ if(has(/aigua|vi\b|sidra|cervesa|refresc|suc\b|licor|cava|xampany|beguda|cola\b|tonica/))return 'Begudes';
+ if(has(/caldo|fumet|fondo|salsa|sofregit|marinada|base de cuina/))return 'Bases de cuina';
+ if(has(/farina|sucre|sal\b|arros|pasta|oli\b|vinagre|conserv|especia|llegum|pa ratllat|rebost|seca?\b/))return 'Secs i rebost';
+ return 'Altres'}
+function guessUnit(name,raw=''){const s=norm(name+' '+raw);if(/\bkg\b|quilo/.test(s))return 'kg';if(/\bl\b|litre/.test(s))return 'litre';if(/ampolla|botella/.test(s))return 'ampolla';if(/caixa|caja/.test(s))return 'caixa';if(/paquet|pack/.test(s))return 'paquet';if(/sac\b/.test(s))return 'sac';return 'unitat'}
+function nextCode(family,reserved=[]){const prefix=prefixes[family]||'ALT';let max=0;[...(state.products||[]),...reserved].forEach(p=>{const code=String(p.supplierCode||p.code||'');const m=code.match(new RegExp('^'+prefix+'-(\\d+)$','i'));if(m)max=Math.max(max,Number(m[1]))});return prefix+'-'+String(max+1).padStart(3,'0')}
+function setStatus(main,detail='',pct=null){$('statusText').textContent=main;$('statusDetail').textContent=detail;if(pct!==null)$('progress').value=Math.max(0,Math.min(100,pct))}
+async function api(path,options={}){const r=await fetch(path,{credentials:'same-origin',headers:{'Content-Type':'application/json',...(options.headers||{})},...options});const txt=await r.text();let d={};try{d=txt?JSON.parse(txt):{}}catch{d={error:txt||'Error HTTP '+r.status}}if(!r.ok&&!d.error)d.error='Error HTTP '+r.status;return d}
+async function loadState(){const d=await api('/api/state');if(!d.error){state=d;families=(d.config?.families||[]).map(x=>x.name);prefixes=Object.fromEntries((d.config?.families||[]).map(x=>[x.name,x.prefix]));}}
+function cleanText(t){return String(t||'').replace(/\r/g,'').replace(/[|¦]/g,'I').replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').trim()}
+function numericToken(tok){const s=String(tok||'').trim().replace(/[€]/g,'').replace(/%$/,'').replace(/[;:]$/,'');if(!/^-?\d{1,7}(?:[.,]\d{1,4})?$/.test(s))return null;return nnum(s)}
+function choosePrice(nums){if(!nums.length)return {price:null,quantity:null,total:null};const total=nums[nums.length-1];let best=null;
+ for(let pi=1;pi<nums.length-1;pi++){const p=nums[pi];if(!(p>0))continue;for(let qi=0;qi<pi;qi++){const q=nums[qi];if(!(q>0))continue;const gross=q*p;if(!(gross>0))continue;const ratio=total/gross;if(ratio<0.60||ratio>1.08)continue;const score=Math.abs(1-ratio)+(Number.isInteger(q)?0:0.03)+(p>total*1.5?0.25:0);if(!best||score<best.score)best={price:p,quantity:q,total,score}}}
+ if(best)return best;
+ for(let i=nums.length-2;i>=0;i--){const p=nums[i];if(p>0&&p<100000)return {price:p,quantity:null,total}}
+ return {price:null,quantity:null,total}}
+function candidateRow(raw,allowWithoutCode=false){const reject=/\b(TOTAL|SUBTOTAL|BASE IMPONIBLE|IVA|CLIENT|FECHA|DATA|FACTURA|ALBAR[ÀA]|VENCIMIENTO|PAGAMENT|FORMA DE PAGO|DIRECCI[ÓO]N|DOMICILIO|TEL[EÉ]FONO|CIF|NIF)\b/i;if(reject.test(raw))return null;
+ let tokens=String(raw||'').trim().split(/\s+/).filter(Boolean);if(tokens.length<4)return null;
+ const first=tokens[0].replace(/[.,:;]$/,'');const hasSupplierCode=/^[A-Z0-9][A-Z0-9\-\/]{1,9}$/i.test(first)&&/\d/.test(first);
+ if(hasSupplierCode)tokens.shift();else if(!allowWithoutCode)return null;
+ let start=tokens.length;while(start>0){const t=tokens[start-1];if(numericToken(t)!==null||/^[-–—]$/.test(t)||/^\d+(?:[.,]\d+)?%$/.test(t))start--;else break}
+ const tail=tokens.slice(start).map(numericToken).filter(v=>v!==null);if(tail.length<2)return null;
+ let name=tokens.slice(0,start).join(' ').replace(/^[^A-ZÀ-Ü0-9]+|[^A-ZÀ-Ü0-9)%/.-]+$/gi,'').trim();
+ if(name.length<3||!/[\p{L}]/u.test(name))return null;
+ const picked=choosePrice(tail);if(!(picked.price>=0))return null;
+ const family=guessFamily(name);
+ return {include:true,code:'',name,unit:guessUnit(name,raw),price:picked.price,family,subfamily:'',quantity:picked.quantity,total:picked.total,raw,autoCode:true}}
+function parseLines(text){const lines=cleanText(text).split('\n').map(x=>x.trim()).filter(Boolean);const out=[];const seen=new Set();
+ const add=item=>{if(!item)return;const key=norm(item.name)+'|'+Number(item.price||0).toFixed(3);if(seen.has(key))return;seen.add(key);out.push(item)};
+ for(const raw of lines)add(candidateRow(raw,false));
+ if(!out.length){for(const raw of lines)add(candidateRow(raw,true))}
+ if(!out.length){for(let i=0;i<lines.length-1;i++)add(candidateRow(lines[i]+' '+lines[i+1],true))}
+ return out}
+function assignMissingCodes(){const reserved=[];for(const item of items){if(!item.code){item.code=nextCode(item.family,reserved);item.autoCode=true}reserved.push({supplierCode:item.code})}}
+function familyOptions(selected){return families.map(f=>`<option ${f===selected?'selected':''}>${f}</option>`).join('')}
+function unitOptions(selected){const u=['unitat','kg','litre','ampolla','caixa','paquet','sac'];return u.map(x=>`<option ${x===selected?'selected':''}>${x}</option>`).join('')}
+function render(){assignMissingCodes();const body=$('rowsBody');body.innerHTML='';if(!items.length){body.innerHTML='<tr><td colspan="8" class="empty">No s’han detectat línies. Pots afegir-les amb «+ Afegir producte».</td></tr>';$('saveBtn').disabled=true;$('countPill').textContent='0 línies';return}items.forEach((it,i)=>{const tr=document.createElement('tr');tr.innerHTML=`<td><input class="check" type="checkbox" data-k="include" data-i="${i}" ${it.include!==false?'checked':''}></td><td><input data-k="code" data-i="${i}" value="${escapeAttr(it.code)}"></td><td class="name"><input data-k="name" data-i="${i}" value="${escapeAttr(it.name)}"></td><td><select data-k="unit" data-i="${i}">${unitOptions(it.unit)}</select></td><td><input data-k="price" data-i="${i}" type="number" min="0" step="0.001" value="${Number(it.price||0)}"></td><td><select data-k="family" data-i="${i}">${familyOptions(it.family)}</select></td><td><input data-k="subfamily" data-i="${i}" value="${escapeAttr(it.subfamily||'')}"></td><td><button class="red" data-delete="${i}">×</button></td>`;body.appendChild(tr)});body.querySelectorAll('[data-k]').forEach(el=>el.addEventListener('input',e=>{const i=Number(e.target.dataset.i),k=e.target.dataset.k;items[i][k]=k==='include'?e.target.checked:(k==='price'?Number(e.target.value||0):e.target.value);if(k==='family'&&items[i].autoCode){items[i].code='';render()}}));body.querySelectorAll('[data-delete]').forEach(b=>b.addEventListener('click',()=>{items.splice(Number(b.dataset.delete),1);render()}));$('saveBtn').disabled=!items.some(x=>x.include!==false&&x.name&&Number(x.price)>=0);$('countPill').textContent=items.length+' línies'}
+function escapeAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function drawImage(){if(!originalImage)return null;const c=$('canvas'),ctx=c.getContext('2d',{willReadFrequently:true});const a=((rotation%360)+360)%360,swap=a===90||a===270;let w=originalImage.naturalWidth,h=originalImage.naturalHeight;const scale=Math.min(1.8,2600/Math.max(w,h));w=Math.round(w*scale);h=Math.round(h*scale);c.width=swap?h:w;c.height=swap?w:h;ctx.save();ctx.translate(c.width/2,c.height/2);ctx.rotate(a*Math.PI/180);ctx.drawImage(originalImage,-w/2,-h/2,w,h);ctx.restore();if($('enhance').checked){const im=ctx.getImageData(0,0,c.width,c.height),d=im.data;let min=255,max=0;for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2];min=Math.min(min,g);max=Math.max(max,g)}const range=Math.max(35,max-min);for(let i=0;i<d.length;i+=4){let g=.299*d[i]+.587*d[i+1]+.114*d[i+2];g=(g-min)*255/range;g=Math.max(0,Math.min(255,(g-128)*1.18+128));d[i]=d[i+1]=d[i+2]=g}ctx.putImageData(im,0,0)}return c.toDataURL('image/png',.96)}
+function updatePreview(){const url=drawImage();if(url){$('preview').src=url;$('preview').style.display='block';$('previewHint').style.display='none'}}
+async function loadFile(file){if(!file)return;if(!file.type.startsWith('image/')){alert('Cal una imatge JPG, PNG o WEBP.');return}const img=new Image(),url=URL.createObjectURL(file);img.onload=()=>{originalImage=img;rotation=0;updatePreview();$('readBtn').disabled=false;$('leftBtn').disabled=false;$('rightBtn').disabled=false;setStatus('Imatge preparada','Prem «Llegir productes».',0)};img.onerror=()=>alert('No s’ha pogut obrir la imatge.');img.src=url}
+async function ensureWorker(){if(worker)return worker;if(typeof Tesseract==='undefined')throw new Error('No s’ha carregat Tesseract.');worker=await Tesseract.createWorker('spa',1,{workerPath:location.origin+'/vendor/tesseract/worker.min.js',langPath:location.origin+'/vendor/tesseract/lang',corePath:location.origin+'/vendor/tesseract/core/tesseract-core-lstm.wasm.js',logger:m=>{if(m.progress!==undefined)setStatus(m.status,Math.round(m.progress*100)+'%',Math.round(m.progress*100))}});await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'});return worker}
+async function read(){if(!originalImage)return;$('readBtn').disabled=true;try{const w=await ensureWorker();setStatus('Llegint productes','OCR en curs...',5);const out=await w.recognize(drawImage());const text=cleanText(out?.data?.text||'');$('rawText').value=text;items=parseLines(text);assignMissingCodes();render();setStatus('Lectura acabada',items.length+' productes detectats · '+text.length+' caràcters OCR. Revisa nom, preu i família.',100)}catch(e){setStatus('Error OCR',e.message,0);alert(e.message)}finally{$('readBtn').disabled=false}}
+async function save(){const selected=items.filter(x=>x.include!==false&&String(x.name||'').trim());if(!selected.length){alert('No hi ha productes seleccionats.');return}assignMissingCodes();$('saveBtn').disabled=true;$('saveResult').innerHTML='<div class="result">Guardant productes...</div>';const rows=selected.map(x=>({code:x.code,supplierCode:'',name:String(x.name).trim(),unit:x.unit||'unitat',price:Number(x.price||0),lastPurchasePrice:Number(x.price||0),family:x.family||'Altres',subfamily:x.subfamily||'',status:'active'}));try{const r=await api('/api/products-bulk',{method:'POST',body:JSON.stringify({supplierId:'',rows})});if(r.error)throw new Error(r.error);$('saveResult').innerHTML=`<div class="result"><b>✅ Productes guardats al magatzem</b><br>Nous: ${r.created||0} · Actualitzats: ${r.updated||0} · Omesos: ${r.skipped||0}<br><a href="/#products">Obrir Productes / Magatzem</a></div>`;await loadState();setStatus('Productes guardats','Ja són al magatzem.',100)}catch(e){$('saveResult').innerHTML=`<div class="result error"><b>❌ Error</b><br>${escapeAttr(e.message)}</div>`}finally{$('saveBtn').disabled=false}}
+async function loadInboxIfAny(){const id=new URLSearchParams(location.search).get('inbox');if(!id)return;sourceInboxId=id;try{const s=await api('/api/state');if(s.error)throw new Error(s.error);state=s;const inbox=(s.purchaseInbox||[]).find(x=>String(x.id)===String(id)),att=(s.attachments||[]).find(a=>inbox&&String(a.id)===String(inbox.attachmentId));if(!att)throw new Error('No s’ha trobat la imatge guardada.');if(String(att.mime||'').includes('pdf')||/\.pdf$/i.test(att.name||''))throw new Error('El PDF s’ha de convertir a JPG o PNG.');const r=await fetch('/api/file/'+encodeURIComponent(att.id),{credentials:'same-origin'});if(!r.ok)throw new Error('No s’ha pogut recuperar la imatge.');const blob=await r.blob();await loadFile(new File([blob],att.name||'document.jpg',{type:att.mime||blob.type||'image/jpeg'}));setStatus('Imatge recuperada','Prem «Llegir productes».',0)}catch(e){setStatus('No s’ha pogut recuperar',e.message,0)}}
+$('fileInput').addEventListener('change',e=>loadFile(e.target.files[0]));$('leftBtn').addEventListener('click',()=>{rotation-=90;updatePreview()});$('rightBtn').addEventListener('click',()=>{rotation+=90;updatePreview()});$('enhance').addEventListener('change',updatePreview);$('readBtn').addEventListener('click',read);$('analyzeBtn').addEventListener('click',()=>{items=parseLines($('rawText').value);render();setStatus('Text analitzat',items.length+' productes detectats.',100)});$('clearBtn').addEventListener('click',()=>{$('rawText').value='';items=[];render()});$('addBtn').addEventListener('click',()=>{items.push({include:true,code:'',name:'',unit:'unitat',price:0,family:'Altres',subfamily:'',autoCode:true});render()});$('reclassBtn').addEventListener('click',()=>{items.forEach(x=>{x.family=guessFamily(x.name);if(x.autoCode)x.code=''});render()});$('saveBtn').addEventListener('click',save);
+loadState().then(loadInboxIfAny);render();
+})();
+</script>
+</body></html>

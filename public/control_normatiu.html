@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control Normatiu Restaurant - Catàlegs i desplegables</title>
+  <style>
+    :root{
+      --bg:#f4f6f8; --panel:#ffffff; --ink:#1f2937; --muted:#6b7280; --line:#111827;
+      --accent:#0f766e; --accent2:#115e59; --danger:#b91c1c; --soft:#e5e7eb; --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+    header{background:#111827;color:white;padding:18px 22px;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    header h1{margin:0;font-size:22px;letter-spacing:.2px}
+    header small{color:#d1d5db;display:block;margin-top:4px}
+    .wrap{display:flex;min-height:calc(100vh - 78px)}
+    nav{width:292px;background:#ffffff;border-right:1px solid #d1d5db;padding:12px;position:sticky;top:0;height:calc(100vh - 78px);overflow:auto}
+    nav button{width:100%;text-align:left;border:1px solid #d1d5db;background:#fff;margin:4px 0;padding:11px 12px;border-radius:8px;cursor:pointer;font-weight:700;color:#111827}
+    nav button.active, nav button:hover{background:#ccfbf1;border-color:#0f766e;color:#0f3b36}
+    nav .navTitle{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#6b7280;margin:14px 4px 6px;font-weight:900}
+    main{flex:1;padding:18px;overflow:auto}
+    .card{background:var(--panel);border:1px solid #d1d5db;border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+    .card h2{margin:0 0 8px 0;font-size:22px}
+    .card h3{margin:10px 0 8px 0;font-size:17px}
+    .hint{background:#ecfeff;border:1px solid #67e8f9;color:#164e63;border-radius:10px;padding:10px;margin:10px 0;font-size:14px}
+    .warning{background:#fff7ed;border:1px solid #fdba74;color:#7c2d12;border-radius:10px;padding:10px;margin:10px 0;font-size:14px}
+    .okbox{background:#ecfdf5;border:1px solid #6ee7b7;color:#065f46;border-radius:10px;padding:10px;margin:10px 0;font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:12px}
+    .grid3{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:12px}
+    label{font-size:13px;font-weight:700;display:block;margin:0 0 5px 2px;color:#374151}
+    input, select, textarea{width:100%;border:1px solid #9ca3af;border-radius:8px;padding:9px;font-size:15px;background:#fff}
+    textarea{min-height:68px;resize:vertical}
+    input[readonly], textarea[readonly]{background:#f3f4f6;color:#374151}
+    .actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center}
+    .btn{border:none;border-radius:8px;background:var(--accent);color:white;padding:10px 13px;font-weight:800;cursor:pointer;display:inline-block;text-decoration:none;font-size:14px}
+    .btn:hover{background:var(--accent2)}
+    .btn.secondary{background:#374151}.btn.secondary:hover{background:#1f2937}
+    .btn.light{background:#e5e7eb;color:#111827;border:1px solid #9ca3af}.btn.light:hover{background:#d1d5db}
+    .btn.warn{background:#f59e0b;color:#111827}.btn.warn:hover{background:#d97706;color:white}
+    .btn.danger{background:var(--danger)}
+    .btn.small{padding:6px 8px;font-size:12px;border-radius:6px}
+    table{width:100%;border-collapse:collapse;background:#fff;margin-top:10px}
+    th,td{border:1px solid #9ca3af;padding:8px;font-size:13px;vertical-align:top}
+    th{background:#e5e7eb;color:#111827;text-align:left;font-weight:900}
+    tr:nth-child(even) td{background:#f9fafb}
+    .logoBox{height:92px;border:1px dashed #9ca3af;border-radius:8px;display:flex;align-items:center;justify-content:center;background:#f9fafb;overflow:hidden}
+    .logoBox img{max-width:100%;max-height:90px}
+    .status{font-size:14px;color:#065f46;font-weight:800;margin-left:4px}
+    .footerNote{font-size:12px;color:#6b7280;margin-top:10px;line-height:1.35}
+    .topbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+    .searchbox{max-width:360px}
+    .pill{display:inline-block;border:1px solid #99f6e4;background:#ccfbf1;color:#134e4a;border-radius:999px;padding:3px 8px;font-size:12px;font-weight:800;margin:2px}
+    .miniStats{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .miniStats span{background:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:800;color:#374151}
+    @media(max-width:900px){.wrap{display:block}nav{width:100%;height:auto;position:relative}.grid,.grid3{grid-template-columns:1fr}header{display:block}}
+    @media print{
+      body{background:#fff}
+      header,nav,.no-print{display:none!important}
+      main{padding:0}
+      .card{box-shadow:none;border:0;border-radius:0;padding:0}
+      table{page-break-inside:auto}
+      tr{page-break-inside:avoid;page-break-after:auto}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Control Normatiu Restaurant</h1>
+    <small>APPCC · PRL · Catàlegs · Zones del local · Desplegables · Impressió</small>
+  </div>
+  <div id="empresaHeader">Empresa no configurada</div>
+</header>
+<div class="wrap">
+<nav id="menu"></nav>
+<main id="app"></main>
+</div>
+<script src="/control_initial.js"></script>
+<script>
+(function(){
+  'use strict';
+  const STORAGE_KEY = 'CNR_APP_SEGURA_V6_CATALEGS';
+  const LEGACY_KEY = 'CNR_APP_SEGURA_V5';
+
+  const sections = {
+    empresa: { title:'Empresa', type:'empresa' },
+    zones: { title:'Configuració del local - Zones i equips', code:'CONF-ZONES-01', catalog:true, help:'Defineix totes les zones de treball, cambres, congeladors, magatzems i equips. Després apareixeran com a desplegable als registres.', fields:[
+      ['codi','Codi zona / equip','text'],
+      ['nom','Nom zona / equip','text'],
+      ['tipus','Tipus','select:Cuina calenta|Cuina freda|Zona preparació|Office / rentaplats|Cambra frigorífica|Congelador|Magatzem sec|Barra|Sala|Lavabos|Vestuaris|Residus|Recepció mercaderies|Equip|Altres'],
+      ['nivell_risc','Nivell de risc APPCC','select:Alt|Mitjà|Baix|No aplica'],
+      ['frequencia','Freqüència neteja habitual','select:Després de cada ús|Durant el servei|Diària|Setmanal|Mensual|Trimestral|Segons necessitat'],
+      ['responsable','Responsable habitual','text'],
+      ['temperatures','Control temperatures','select:No|Sí - fred positiu|Sí - congelació|Sí - calent|Sí - altre'],
+      ['actiu','Actiu','select:Sí|No'],
+      ['observacions','Observacions','textarea']
+    ]},
+    productes_neteja: { title:'Catàleg de productes de neteja i desinfecció', code:'APPCC-PROD-01', catalog:true, help:'Quan crees un producte aquí, apareix automàticament al desplegable dels registres de neteja.', fields:[
+      ['producte','Producte','text'],
+      ['tipus','Tipus','select:Detergent|Desinfectant|Desgreixant|Lleixiu / hipoclorit|Amoni quaternari|Rentaplats|Abrillantador|Descalcificador|Netejador superfícies|Altres'],
+      ['proveidor','Proveïdor','text'],
+      ['dilucio','Dilució recomanada','text'],
+      ['temps_contacte','Temps de contacte','text'],
+      ['zona_us','Zona d’ús habitual','selectdyn:zones'],
+      ['apte_alimentari','Apte contacte alimentari','select:Sí|No|Pendent verificar'],
+      ['fitxa','Fitxa tècnica / seguretat disponible','select:Sí|No|Pendent'],
+      ['actiu','Actiu','select:Sí|No'],
+      ['observacions','Observacions','textarea']
+    ]},
+    neteja: { title:'APPCC - Registre de neteja diària', code:'APPCC-NET-01', fields:[
+      ['data','Data','date'],
+      ['zona','Zona / equip','selectdyn:zones'],
+      ['tasca','Tasca realitzada','text'],
+      ['producte','Producte utilitzat','selectdyn:productes'],
+      ['dilucio','Dilució aplicada','text'],
+      ['temps_contacte','Temps de contacte','text'],
+      ['hora','Hora','time'],
+      ['conforme','Conforme','select:Sí|No|Pendent'],
+      ['responsable','Responsable','text'],
+      ['observacions','Observacions','textarea'],
+      ['accio','Acció correctiva','textarea']
+    ]},
+    neteja_setmanal: { title:'APPCC - Registre de neteja setmanal / mensual', code:'APPCC-NET-02', fields:[
+      ['data','Data','date'],
+      ['zona','Zona / equip','selectdyn:zones'],
+      ['tasca','Tasca a fons','text'],
+      ['frequencia','Freqüència','select:Setmanal|Quinzenal|Mensual|Trimestral'],
+      ['producte','Producte utilitzat','selectdyn:productes'],
+      ['dilucio','Dilució aplicada','text'],
+      ['temps_contacte','Temps de contacte','text'],
+      ['conforme','Conforme','select:Sí|No|Pendent'],
+      ['responsable','Responsable','text'],
+      ['observacions','Observacions','textarea'],
+      ['accio','Acció correctiva','textarea']
+    ]},
+    temperatures: { title:'APPCC - Control de temperatures', code:'APPCC-TEMP-01', fields:[
+      ['data','Data','date'],
+      ['hora','Hora','time'],
+      ['equip','Equip / cambra / congelador','selectdyn:zones_temp'],
+      ['temperatura','Temperatura registrada','number'],
+      ['limit','Límit establert','text'],
+      ['conforme','Conforme','select:Sí|No|Pendent'],
+      ['responsable','Responsable','text'],
+      ['accio','Acció correctiva','textarea']
+    ]},
+    incidencies: { title:'Incidències i accions correctives', code:'INC-AC-01', fields:[
+      ['data','Data','date'],
+      ['seccio','Secció','select:APPCC|PRL|EPIs|Formació|Assetjament|Altres'],
+      ['zona','Zona / equip afectat','selectdyn:zones'],
+      ['incidencia','Incidència detectada','textarea'],
+      ['risc','Nivell de risc','select:Baix|Mitjà|Alt|Crític'],
+      ['accio','Acció immediata','textarea'],
+      ['seguiment','Seguiment','textarea'],
+      ['responsable','Responsable','text'],
+      ['estat','Estat','select:Obert|En seguiment|Tancat']
+    ]},
+    formacio: { title:'Formació del personal', code:'FORM-01', fields:[
+      ['data','Data','date'], ['treballador','Treballador/a','text'], ['formacio','Formació rebuda','text'], ['formador','Formador/a','text'],
+      ['durada','Durada','text'], ['resultat','Resultat','select:Apte|No apte|Assistència'], ['signatura','Signatura','text'], ['observacions','Observacions','textarea']
+    ]},
+    epis: { title:'Registre de lliurament d’EPIs', code:'PRL-EPI-01', fields:[
+      ['data','Data entrega','date'], ['treballador','Treballador/a','text'], ['epi','EPI entregat','text'], ['estat','Estat','select:Nou|Reposició|Retorn|Deteriorat'],
+      ['reposicio','Data reposició prevista','date'], ['responsable','Responsable entrega','text'], ['signatura','Signatura treballador/a','text'], ['observacions','Observacions','textarea']
+    ]},
+    riscos: { title:'PRL - Riscos laborals per lloc de treball', code:'PRL-RISC-01', fields:[
+      ['data','Data revisió','date'], ['lloc','Lloc / zona de treball','selectdyn:zones'], ['risc','Risc detectat','textarea'], ['mesura','Mesura preventiva','textarea'],
+      ['responsable','Responsable','text'], ['proxima','Propera revisió','date'], ['estat','Estat','select:Pendent|En curs|Aplicat|Revisar'], ['observacions','Observacions','textarea']
+    ]},
+    assetjament: { title:'Protocol d’assetjament - Registre reservat', code:'ASSETJ-RES-01', confidential:true, fields:[
+      ['codi','Codi intern','text'], ['data','Data','date'], ['receptor','Persona receptora','text'], ['tipus','Tipus','select:Assetjament sexual|Per raó de sexe|Laboral|Conducta inadequada|Altres'],
+      ['descripcio','Descripció resumida','textarea'], ['actuacio','Actuació realitzada','textarea'], ['seguiment','Seguiment','textarea'], ['estat','Estat','select:Obert|En investigació|Mesures aplicades|Tancat']
+    ]}
+  };
+
+  let db = loadDB();
+  let current = 'empresa';
+  let editIndex = null;
+
+  function emptyDB(){ return {empresa:{}, records:{}}; }
+  function loadDB(){
+    try {
+      const v6 = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if(v6 && v6.records) return normalizeDB(v6);
+      const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY));
+      if(legacy && legacy.records) return normalizeDB(legacy);
+      return normalizeDB(window.__CONTROL_INITIAL__ || emptyDB());
+    } catch(e){ return normalizeDB(window.__CONTROL_INITIAL__ || emptyDB()); }
+  }
+  function normalizeDB(raw){
+    const out = raw || emptyDB();
+    out.empresa = out.empresa || {};
+    out.records = out.records || {};
+    Object.keys(sections).forEach(k=>{ if(k !== 'empresa' && !out.records[k]) out.records[k]=[]; });
+    // Migració suau de productes antics: afegeix camp actiu per poder-los usar al desplegable.
+    (out.records.productes_neteja||[]).forEach(p=>{ if(!p.actiu) p.actiu='Sí'; });
+    (out.records.zones||[]).forEach(z=>{ if(!z.actiu) z.actiu='Sí'; });
+    return out;
+  }
+  function saveDB(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); fetch('/api/control-state',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(db)}).catch(()=>{}); updateHeader(); flash('Dades guardades correctament.'); }
+  function flash(msg){ const el=document.getElementById('status'); if(el){ el.textContent=msg; setTimeout(()=>{el.textContent='';},2500);} }
+  function esc(s){ return String(s ?? '').replace(/[&<>\"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[m]||m)); }
+  function today(){ return new Date().toISOString().slice(0,10); }
+  function nowTime(){ return new Date().toTimeString().slice(0,5); }
+  function fieldsOf(k){ return sections[k].fields || []; }
+  function getRecords(k){ if(!db.records[k]) db.records[k]=[]; return db.records[k]; }
+
+  function buildMenu(){
+    const menu=document.getElementById('menu');
+    const groups = [
+      ['Configuració', ['empresa','zones','productes_neteja']],
+      ['APPCC', ['neteja','neteja_setmanal','temperatures','incidencies']],
+      ['PRL i personal', ['formacio','epis','riscos','assetjament']]
+    ];
+    let html = groups.map(([title, keys]) => `<div class="navTitle">${esc(title)}</div>` + keys.map(k=>`<button data-sec="${k}" class="${k===current?'active':''}">${sections[k].title}</button>`).join('')).join('') +
+      `<div class="navTitle">Dades</div><button data-sec="backup">Còpia seguretat / Restaurar</button>`;
+    menu.innerHTML = html;
+    menu.querySelectorAll('button').forEach(b=>b.onclick=()=>{ current=b.dataset.sec; editIndex=null; render(); });
+  }
+  function updateHeader(){
+    const e=db.empresa||{};
+    const logo=e.logo ? `<img src="${e.logo}" style="max-height:42px;vertical-align:middle;margin-right:8px;border-radius:4px">` : '';
+    document.getElementById('empresaHeader').innerHTML = logo + (e.nom ? `<strong>${esc(e.nom)}</strong>` : 'Empresa no configurada');
+  }
+  function render(){ buildMenu(); updateHeader(); if(current==='backup') return renderBackup(); if(current==='empresa') return renderEmpresa(); return renderSection(current); }
+
+  function renderEmpresa(){
+    const e=db.empresa||{};
+    document.getElementById('app').innerHTML = `
+      <div class="card">
+        <h2>Formulari de nova empresa</h2>
+        <div class="hint">El logo de l’empresa s’incorpora internament i sortirà a totes les plantilles imprimibles. Les dades es guarden dins el navegador; fes còpies de seguretat sovint.</div>
+        <div class="grid">
+          <div><label>Nom empresa</label><input id="nom" value="${esc(e.nom)}"></div>
+          <div><label>CIF / NIF</label><input id="cif" value="${esc(e.cif)}"></div>
+          <div><label>Adreça</label><input id="adreca" value="${esc(e.adreca)}"></div>
+          <div><label>Població</label><input id="poblacio" value="${esc(e.poblacio)}"></div>
+          <div><label>Telèfon</label><input id="telefon" value="${esc(e.telefon)}"></div>
+          <div><label>Email</label><input id="email" value="${esc(e.email)}"></div>
+          <div><label>Responsable</label><input id="responsable" value="${esc(e.responsable)}"></div>
+          <div><label>Centre de treball</label><input id="centre" value="${esc(e.centre)}"></div>
+        </div>
+        <h3>Logo empresa</h3>
+        <div class="grid">
+          <div>
+            <label>Seleccionar logo</label>
+            <input type="file" id="logoFile" accept="image/*">
+            <div class="footerNote">Formats recomanats: PNG o JPG. Si pesa molt, millor reduir la imatge abans.</div>
+          </div>
+          <div><label>Vista logo</label><div class="logoBox" id="logoPreview">${e.logo?`<img src="${e.logo}">`:'Sense logo'}</div></div>
+        </div>
+        <div class="actions no-print">
+          <button class="btn" id="saveEmpresa">Guardar empresa</button>
+          <button class="btn light" id="clearLogo">Treure logo</button>
+          <button class="btn secondary" id="printEmpresa">Imprimir fitxa empresa</button>
+          <span id="status" class="status"></span>
+        </div>
+      </div>`;
+    const file = document.getElementById('logoFile');
+    file.onchange = function(){
+      const f=file.files[0]; if(!f) return;
+      const reader=new FileReader();
+      reader.onload = ev => { db.empresa.logo = ev.target.result; document.getElementById('logoPreview').innerHTML=`<img src="${db.empresa.logo}">`; saveDB(); };
+      reader.readAsDataURL(f);
+    };
+    document.getElementById('saveEmpresa').onclick = () => {
+      ['nom','cif','adreca','poblacio','telefon','email','responsable','centre'].forEach(id=>db.empresa[id]=document.getElementById(id).value.trim());
+      saveDB();
+    };
+    document.getElementById('clearLogo').onclick = () => { if(confirm('Vols treure el logo?')){ db.empresa.logo=''; saveDB(); renderEmpresa(); } };
+    document.getElementById('printEmpresa').onclick = () => printEmpresa();
+  }
+
+  function renderSection(k){
+    const s=sections[k], recs=getRecords(k);
+    const formFields = fieldsOf(k).map(f=>fieldHTML(f, editIndex!==null ? recs[editIndex][f[0]] : defaultValue(f))).join('');
+    const displayFields = fieldsOf(k).slice(0,7);
+    const rows = recs.map((r,i)=>`<tr>${displayFields.map(f=>`<td>${esc(r[f[0]])}</td>`).join('')}<td class="no-print"><button class="btn small light" onclick="window.__editRec(${i})">Editar</button> <button class="btn small danger" onclick="window.__delRec(${i})">Eliminar</button></td></tr>`).join('');
+    const headers = displayFields.map(f=>`<th>${esc(f[1])}</th>`).join('') + '<th class="no-print">Accions</th>';
+    const stat = sectionStats(k);
+    document.getElementById('app').innerHTML = `
+      <div class="card">
+        <div class="topbar"><div><h2>${esc(s.title)}</h2><div class="footerNote">Codi documental: ${esc(s.code||'')}</div></div><input class="searchbox no-print" id="search" placeholder="Cercar en registres..."></div>
+        ${s.help?`<div class="hint">${esc(s.help)}</div>`:''}
+        ${k==='neteja'||k==='neteja_setmanal'?linkedHintNeteja():''}
+        ${k==='temperatures'?linkedHintTemperatures():''}
+        ${s.confidential?'<div class="warning"><strong>Registre reservat.</strong> Recomanat imprimir i arxivar amb accés restringit.</div>':''}
+        <div class="miniStats">${stat}</div>
+        <div class="grid3">${formFields}</div>
+        <div class="actions no-print">
+          <button class="btn" id="saveRec">${editIndex!==null?'Actualitzar registre':'Guardar registre'}</button>
+          <button class="btn light" id="newRec">Nou registre</button>
+          ${customButtons(k)}
+          <button class="btn secondary" id="printBlank">Imprimir plantilla buida</button>
+          <button class="btn secondary" id="printList">Imprimir llista / registres</button>
+          <button class="btn light" id="exportXLS">Exportar Excel .xls</button>
+          <button class="btn light" id="exportCSV">Exportar CSV</button>
+          <label class="btn light" style="cursor:pointer">Importar CSV<input type="file" id="importCSV" accept=".csv" style="display:none"></label>
+          <span id="status" class="status"></span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>${s.catalog?'Elements guardats':'Registres guardats'} (${recs.length})</h3>
+        <div style="overflow:auto"><table id="recordsTable"><thead><tr>${headers}</tr></thead><tbody>${rows || '<tr><td colspan="9">Encara no hi ha registres.</td></tr>'}</tbody></table></div>
+      </div>`;
+    document.getElementById('saveRec').onclick=()=>saveRecord(k);
+    document.getElementById('newRec').onclick=()=>{editIndex=null; renderSection(k);};
+    document.getElementById('printBlank').onclick=()=>printBlank(k);
+    document.getElementById('printList').onclick=()=>printRecords(k);
+    document.getElementById('exportXLS').onclick=()=>exportXLS(k);
+    document.getElementById('exportCSV').onclick=()=>exportCSV(k);
+    document.getElementById('importCSV').onchange=(ev)=>importCSV(k, ev.target.files[0]);
+    document.getElementById('search').oninput=(ev)=>filterTable(ev.target.value);
+    attachDynamicEvents(k);
+    if(document.getElementById('loadZonesDemo')) document.getElementById('loadZonesDemo').onclick=loadDemoZones;
+    if(document.getElementById('loadProductsDemo')) document.getElementById('loadProductsDemo').onclick=loadDemoProducts;
+    window.__editRec = (i)=>{ editIndex=i; renderSection(k); window.scrollTo(0,0); };
+    window.__delRec = (i)=>{ if(confirm('Eliminar aquest registre?')){ getRecords(k).splice(i,1); saveDB(); renderSection(k); } };
+  }
+
+  function customButtons(k){
+    if(k==='zones') return `<button class="btn warn" id="loadZonesDemo">Carregar zones exemple</button>`;
+    if(k==='productes_neteja') return `<button class="btn warn" id="loadProductsDemo">Carregar productes exemple</button>`;
+    return '';
+  }
+  function sectionStats(k){
+    const zones = getRecords('zones').filter(z=>z.actiu!=='No').length;
+    const prod = getRecords('productes_neteja').filter(p=>p.actiu!=='No').length;
+    if(k==='neteja'||k==='neteja_setmanal') return `<span>Zones actives: ${zones}</span><span>Productes actius: ${prod}</span>`;
+    if(k==='temperatures') return `<span>Zones/equips actius: ${zones}</span><span>Amb control temperatura: ${getZonesTemp().length}</span>`;
+    if(k==='zones') return `<span>Total zones: ${getRecords('zones').length}</span><span>Actives: ${zones}</span>`;
+    if(k==='productes_neteja') return `<span>Total productes: ${getRecords('productes_neteja').length}</span><span>Actius: ${prod}</span>`;
+    return `<span>Total registres: ${getRecords(k).length}</span>`;
+  }
+  function linkedHintNeteja(){
+    const zones = getRecords('zones').filter(z=>z.actiu!=='No').length;
+    const prod = getRecords('productes_neteja').filter(p=>p.actiu!=='No').length;
+    if(!zones || !prod) return `<div class="warning"><strong>Recomanat:</strong> abans de fer registres de neteja, crea les zones del local i els productes de neteja. Així els camps Zona i Producte sortiran amb desplegables.</div>`;
+    return `<div class="okbox">Els camps Zona i Producte estan vinculats als catàlegs configurats.</div>`;
+  }
+  function linkedHintTemperatures(){
+    if(!getZonesTemp().length) return `<div class="warning"><strong>Recomanat:</strong> a Configuració del local marca “Control temperatures” a les cambres, congeladors o equips. Així apareixeran al desplegable.</div>`;
+    return `<div class="okbox">El desplegable d’equips agafa les zones marcades amb control de temperatura.</div>`;
+  }
+
+  function defaultValue(f){ if(f[2]==='date') return today(); if(f[2]==='time') return nowTime(); if(f[0]==='actiu') return 'Sí'; return ''; }
+  function fieldHTML(f, val){
+    const [id,label,type]=f; val = val ?? '';
+    if(type && type.startsWith('selectdyn:')){
+      const listName=type.slice(10);
+      const options = getDynamicOptions(listName);
+      const emptyLabel = options.length ? '-- Selecciona --' : '-- Primer crea elements al catàleg --';
+      return `<div><label>${esc(label)}</label><select id="f_${id}" data-dyn="${esc(listName)}"><option value="">${emptyLabel}</option>${options.map(o=>`<option value="${esc(o.value)}" ${o.value===val?'selected':''}>${esc(o.label)}</option>`).join('')}</select></div>`;
+    }
+    if(type && type.startsWith('select:')){
+      const opts=type.slice(7).split('|');
+      return `<div><label>${esc(label)}</label><select id="f_${id}">${opts.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`;
+    }
+    if(type==='textarea') return `<div style="grid-column:span 1"><label>${esc(label)}</label><textarea id="f_${id}">${esc(val)}</textarea></div>`;
+    return `<div><label>${esc(label)}</label><input id="f_${id}" type="${esc(type||'text')}" value="${esc(val)}"></div>`;
+  }
+  function getDynamicOptions(listName){
+    if(listName==='zones') return getZones().map(z=>({value:z.nom || z.codi, label:zoneLabel(z)}));
+    if(listName==='zones_temp') return getZonesTemp().map(z=>({value:z.nom || z.codi, label:zoneLabel(z)}));
+    if(listName==='productes') return getProducts().map(p=>({value:p.producte, label:productLabel(p)}));
+    return [];
+  }
+  function getZones(){ return getRecords('zones').filter(z=>z.actiu!=='No' && (z.nom || z.codi)); }
+  function getZonesTemp(){ return getZones().filter(z=>String(z.temperatures||'').startsWith('Sí')); }
+  function getProducts(){ return getRecords('productes_neteja').filter(p=>p.actiu!=='No' && p.producte); }
+  function zoneLabel(z){ return `${z.nom || z.codi}${z.tipus?` · ${z.tipus}`:''}${z.nivell_risc?` · Risc ${z.nivell_risc}`:''}`; }
+  function productLabel(p){ return `${p.producte}${p.tipus?` · ${p.tipus}`:''}${p.dilucio?` · ${p.dilucio}`:''}`; }
+  function attachDynamicEvents(k){
+    const prodSelect = document.getElementById('f_producte');
+    if(prodSelect){
+      prodSelect.onchange = function(){
+        const p=getProducts().find(x=>x.producte===prodSelect.value);
+        if(p){
+          const dil=document.getElementById('f_dilucio'); if(dil && !dil.value) dil.value=p.dilucio||'';
+          const tc=document.getElementById('f_temps_contacte'); if(tc && !tc.value) tc.value=p.temps_contacte||'';
+        }
+      };
+    }
+    const equipSelect = document.getElementById('f_equip');
+    if(equipSelect){
+      equipSelect.onchange = function(){
+        const z=getZones().find(x=>(x.nom||x.codi)===equipSelect.value);
+        const limit=document.getElementById('f_limit');
+        if(z && limit && !limit.value){
+          if(String(z.temperatures).includes('congel')) limit.value='≤ -18 ºC';
+          else if(String(z.temperatures).includes('fred')) limit.value='0 ºC a 4 ºC / segons APPCC';
+          else if(String(z.temperatures).includes('calent')) limit.value='≥ 65 ºC';
+        }
+      };
+    }
+  }
+  function saveRecord(k){
+    const obj={}; fieldsOf(k).forEach(f=>{ obj[f[0]]=document.getElementById('f_'+f[0]).value.trim(); });
+    if(k==='zones' && !obj.nom){ alert('Cal posar un nom de zona o equip.'); return; }
+    if(k==='productes_neteja' && !obj.producte){ alert('Cal posar el nom del producte.'); return; }
+    if(editIndex!==null) getRecords(k)[editIndex]=obj; else getRecords(k).push(obj);
+    editIndex=null; saveDB(); renderSection(k);
+  }
+  function filterTable(q){ q=q.toLowerCase(); document.querySelectorAll('#recordsTable tbody tr').forEach(tr=>{ tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none'; }); }
+
+  function loadDemoZones(){
+    const currentZones=getRecords('zones');
+    const demos=[
+      {codi:'Z01',nom:'Cuina calenta',tipus:'Cuina calenta',nivell_risc:'Alt',frequencia:'Després de cada ús',responsable:'Cap de cuina',temperatures:'No',actiu:'Sí',observacions:'Plaques, fogons, forns i superfícies calentes.'},
+      {codi:'Z02',nom:'Cuina freda / preparació',tipus:'Cuina freda',nivell_risc:'Alt',frequencia:'Després de cada ús',responsable:'Cuiner assignat',temperatures:'No',actiu:'Sí',observacions:'Preparació aliments crus i cuinats.'},
+      {codi:'Z03',nom:'Office / rentaplats',tipus:'Office / rentaplats',nivell_risc:'Mitjà',frequencia:'Diària',responsable:'Ajudant cuina',temperatures:'No',actiu:'Sí',observacions:'Filtres, pica, aigüera i escorredors.'},
+      {codi:'Z04',nom:'Cambra frigorífica 1',tipus:'Cambra frigorífica',nivell_risc:'Alt',frequencia:'Diària',responsable:'Cap de cuina',temperatures:'Sí - fred positiu',actiu:'Sí',observacions:'Control de temperatura diari.'},
+      {codi:'Z05',nom:'Congelador',tipus:'Congelador',nivell_risc:'Alt',frequencia:'Diària',responsable:'Cap de cuina',temperatures:'Sí - congelació',actiu:'Sí',observacions:'Control de temperatura diari.'},
+      {codi:'Z06',nom:'Magatzem sec',tipus:'Magatzem sec',nivell_risc:'Mitjà',frequencia:'Setmanal',responsable:'Responsable magatzem',temperatures:'No',actiu:'Sí',observacions:'Ordre, caducitats i neteja prestatgeries.'},
+      {codi:'Z07',nom:'Zona residus',tipus:'Residus',nivell_risc:'Mitjà',frequencia:'Diària',responsable:'Personal tancament',temperatures:'No',actiu:'Sí',observacions:'Buidatge, neteja de cubells i desinfecció.'}
+    ];
+    demos.forEach(d=>{ if(!currentZones.some(z=>z.nom===d.nom || z.codi===d.codi)) currentZones.push(d); });
+    saveDB(); renderSection('zones');
+  }
+  function loadDemoProducts(){
+    const currentProducts=getRecords('productes_neteja');
+    const demos=[
+      {producte:'Detergent alimentari neutre',tipus:'Detergent',proveidor:'',dilucio:'Segons etiqueta',temps_contacte:'3-5 min',zona_us:'Cuina freda / preparació',apte_alimentari:'Sí',fitxa:'Pendent',actiu:'Sí',observacions:'Neteja principal abans de desinfectar.'},
+      {producte:'Desinfectant superfícies alimentàries',tipus:'Desinfectant',proveidor:'',dilucio:'Segons etiqueta',temps_contacte:'5-10 min',zona_us:'Cuina freda / preparació',apte_alimentari:'Sí',fitxa:'Pendent',actiu:'Sí',observacions:'Respectar temps de contacte.'},
+      {producte:'Desgreixant cuina',tipus:'Desgreixant',proveidor:'',dilucio:'Segons etiqueta',temps_contacte:'5 min',zona_us:'Cuina calenta',apte_alimentari:'Pendent verificar',fitxa:'Pendent',actiu:'Sí',observacions:'Per plaques, campanes i greixos.'},
+      {producte:'Rentaplats màquina',tipus:'Rentaplats',proveidor:'',dilucio:'Automàtica',temps_contacte:'Cicle màquina',zona_us:'Office / rentaplats',apte_alimentari:'Sí',fitxa:'Pendent',actiu:'Sí',observacions:'Controlar dosificador.'},
+      {producte:'Descalcificador',tipus:'Descalcificador',proveidor:'',dilucio:'Segons etiqueta',temps_contacte:'Segons etiqueta',zona_us:'Office / rentaplats',apte_alimentari:'No',fitxa:'Pendent',actiu:'Sí',observacions:'No usar en contacte directe amb aliments sense aclarit.'}
+    ];
+    demos.forEach(d=>{ if(!currentProducts.some(p=>p.producte===d.producte)) currentProducts.push(d); });
+    saveDB(); renderSection('productes_neteja');
+  }
+
+  function companyPrintHeader(title, code){
+    const e=db.empresa||{};
+    const logo=e.logo?`<img src="${e.logo}" style="max-height:70px;max-width:150px">`:'';
+    return `<table class="head"><tr><td style="width:170px;text-align:center">${logo}</td><td><h1>${esc(title)}</h1><div><b>Empresa:</b> ${esc(e.nom||'')}</div><div><b>CIF:</b> ${esc(e.cif||'')} &nbsp; <b>Centre:</b> ${esc(e.centre||'')}</div><div><b>Adreça:</b> ${esc(e.adreca||'')} ${esc(e.poblacio||'')}</div></td><td style="width:150px"><b>Codi:</b><br>${esc(code||'')}<br><br><b>Versió:</b> 1.1<br><b>Data:</b> ${today()}</td></tr></table>`;
+  }
+  function printCSS(){return `<style>
+    @page{size:A4;margin:10mm} body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0} h1{font-size:17px;margin:0 0 6px 0} table{border-collapse:collapse;width:100%}.head td{border:2px solid #111;padding:8px;vertical-align:middle}.grid td,.grid th{border:1.8px solid #111;padding:6px;font-size:10.5px;vertical-align:top}.grid th{background:#e5e7eb;font-size:10.5px;text-align:left}.meta td{border:1.8px solid #111;padding:8px;height:34px}.sign td{border:1.8px solid #111;padding:8px;height:52px}.obs{height:80px}.emptyRow td{height:32px}.small{font-size:10px;color:#333}.conf{font-size:12px;border:2px solid #111;padding:8px;margin:8px 0}.reserved{background:#fff3cd;border:2px solid #111;padding:7px;margin:7px 0;font-weight:bold}</style>`;}
+  function openPrint(html){
+    const w=window.open('', '_blank');
+    w.document.open(); w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Impressió</title>${printCSS()}</head><body>${html}<script>window.onload=function(){window.focus();window.print();};<\/script></body></html>`); w.document.close();
+  }
+  function printBlank(k){
+    const s=sections[k];
+    const header=companyPrintHeader(s.title + ' - PLANTILLA BUIDA', s.code);
+    const meta=`<table class="meta"><tr><td><b>Zona / departament:</b></td><td><b>Responsable:</b></td><td><b>Període:</b></td></tr></table>`;
+    const cols=fieldsOf(k).map(f=>`<th>${esc(f[1])}</th>`).join('');
+    const rows=Array.from({length:12}).map(()=>`<tr class="emptyRow">${fieldsOf(k).map(()=>'<td>&nbsp;</td>').join('')}</tr>`).join('');
+    const reserved=s.confidential?'<div class="reserved">DOCUMENT RESERVAT I CONFIDENCIAL. Arxivar amb accés restringit.</div>':'';
+    const sign=`<table class="sign"><tr><td><b>Observacions generals:</b></td></tr></table><table class="sign"><tr><td><b>Signatura responsable:</b></td><td><b>Verificació direcció / qualitat:</b></td></tr></table>`;
+    openPrint(header + reserved + meta + `<table class="grid"><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table>` + sign);
+  }
+  function printRecords(k){
+    const s=sections[k], recs=getRecords(k);
+    const header=companyPrintHeader(s.title + ' - REGISTRES', s.code);
+    const cols=fieldsOf(k).map(f=>`<th>${esc(f[1])}</th>`).join('');
+    const rows=(recs.length?recs:[{}]).map(r=>`<tr>${fieldsOf(k).map(f=>`<td>${esc(r[f[0]]||'')}</td>`).join('')}</tr>`).join('');
+    const reserved=s.confidential?'<div class="reserved">DOCUMENT RESERVAT I CONFIDENCIAL. Arxivar amb accés restringit.</div>':'';
+    openPrint(header + reserved + `<table class="grid"><thead><tr>${cols}</tr></thead><tbody>${rows}</tbody></table>` + `<table class="sign"><tr><td><b>Responsable:</b></td><td><b>Signatura:</b></td><td><b>Data:</b></td></tr></table>`);
+  }
+  function printEmpresa(){
+    const e=db.empresa||{};
+    const header=companyPrintHeader('Fitxa de dades empresa', 'EMP-01');
+    const rows=['nom','cif','adreca','poblacio','telefon','email','responsable','centre'].map(k=>`<tr><th>${esc(k.toUpperCase())}</th><td>${esc(e[k]||'')}</td></tr>`).join('');
+    openPrint(header + `<table class="grid">${rows}</table><table class="sign"><tr><td><b>Signatura direcció:</b></td><td><b>Data:</b></td></tr></table>`);
+  }
+  function exportCSV(k){
+    const recs=getRecords(k), fields=fieldsOf(k);
+    const csv=[fields.map(f=>csvCell(f[1])).join(';')].concat(recs.map(r=>fields.map(f=>csvCell(r[f[0]]||'')).join(';'))).join('\r\n');
+    download(csv, fileName(k,'csv'), 'text/csv;charset=utf-8');
+  }
+  function csvCell(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }
+  function exportXLS(k){
+    const s=sections[k], fields=fieldsOf(k), recs=getRecords(k);
+    const company=(db.empresa&&db.empresa.nom)||'';
+    const html = `<html><head><meta charset="utf-8"></head><body><h2>${esc(s.title)}</h2><p>Empresa: ${esc(company)}</p><table border="1"><tr>${fields.map(f=>`<th>${esc(f[1])}</th>`).join('')}</tr>${recs.map(r=>`<tr>${fields.map(f=>`<td>${esc(r[f[0]]||'')}</td>`).join('')}</tr>`).join('')}</table></body></html>`;
+    download(html, fileName(k,'xls'), 'application/vnd.ms-excel;charset=utf-8');
+  }
+  function fileName(k, ext){ const e=(db.empresa&&db.empresa.nom?db.empresa.nom:'ControlNormatiu').replace(/[^a-z0-9]+/gi,'_'); return `${e}_${k}_${today()}.${ext}`; }
+  function download(content, name, type){
+    const blob=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+  }
+  function importCSV(k, file){
+    if(!file) return; const reader=new FileReader();
+    reader.onload=()=>{ const lines=String(reader.result).split(/\r?\n/).filter(Boolean); if(lines.length<2) return alert('CSV sense dades.');
+      const fields=fieldsOf(k); const newRows=[]; for(let i=1;i<lines.length;i++){ const vals=parseCSVLine(lines[i]); const obj={}; fields.forEach((f,idx)=>obj[f[0]]=vals[idx]||''); if(k==='zones' && !obj.actiu) obj.actiu='Sí'; if(k==='productes_neteja' && !obj.actiu) obj.actiu='Sí'; newRows.push(obj); }
+      db.records[k]=getRecords(k).concat(newRows); saveDB(); renderSection(k); alert('Importació feta: '+newRows.length+' registres.');
+    }; reader.readAsText(file, 'utf-8');
+  }
+  function parseCSVLine(line){
+    const out=[]; let cur='', q=false; for(let i=0;i<line.length;i++){ const c=line[i]; if(c==='"'){ if(q&&line[i+1]==='"'){cur+='"'; i++;} else q=!q; } else if((c===';'||c===',')&&!q){out.push(cur);cur='';} else cur+=c; } out.push(cur); return out;
+  }
+  function renderBackup(){
+    document.getElementById('app').innerHTML=`<div class="card"><h2>Còpia de seguretat i restauració</h2><div class="hint">Guarda una còpia completa de totes les dades en JSON. Aquesta versió també pot carregar una còpia anterior si la tens exportada.</div><div class="actions"><button class="btn" id="backup">Descarregar còpia completa</button><label class="btn light" style="cursor:pointer">Restaurar còpia JSON<input id="restore" type="file" accept=".json" style="display:none"></label><button class="btn danger" id="wipe">Esborrar totes les dades</button><span id="status" class="status"></span></div><div class="footerNote">Les dades són locals del navegador. No s’envien a internet.</div></div>`;
+    document.getElementById('backup').onclick=()=>download(JSON.stringify(db,null,2), 'ControlNormatiuRestaurant_copia_'+today()+'.json', 'application/json');
+    document.getElementById('restore').onchange=(ev)=>{ const f=ev.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ db=normalizeDB(JSON.parse(r.result)); saveDB(); render(); alert('Còpia restaurada.'); }catch(e){ alert('No s’ha pogut llegir el fitxer JSON.'); } }; r.readAsText(f); };
+    document.getElementById('wipe').onclick=()=>{ if(confirm('ATENCIÓ: vols esborrar totes les dades guardades?')){ db=normalizeDB(emptyDB()); saveDB(); render(); } };
+  }
+  render();
+  fetch('/api/control-state').then(r=>r.json()).then(remote=>{if(remote&&remote.records){db=normalizeDB(remote);localStorage.setItem(STORAGE_KEY,JSON.stringify(db));render();}}).catch(()=>{});
+})();
+</script>
+</body>
+</html>
