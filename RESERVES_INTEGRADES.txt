@@ -1,0 +1,9 @@
+CASA MESTRES · RESERVES INTEGRADES
+
+- Nova secció RESERVES > Gestió de reserves dins app principal.
+- Nova mini app pública: /reserves.html
+- Els menús provenen de Configuració > Cartes, menús i pressupostos.
+- A cada Menú: Publicar a reserves, preu per persona, tipus de fiança i import.
+- Límit online configurable (per defecte 10 pax) i bloqueig de mateix nom + mateix dia.
+- Stripe queda marcat com no connectat fins configurar passarel·la real; no s'ha afegit cap clau.
+- No s'ha modificat la mini app de fitxatges ni Control Normatiu/OCR.

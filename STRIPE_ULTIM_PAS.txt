@@ -1,0 +1,20 @@
+CASA MESTRES · STRIPE CHECKOUT
+
+1. Copia el teu fitxer .env ACTUAL (el que ja has creat) dins aquesta carpeta, al costat de server.js.
+   NO comparteixis ni pugis .env a GitHub.
+
+2. Tanca qualsevol servidor anterior i executa INICIAR_CASA_MESTRES.bat.
+
+3. Obre Reserves, crea una reserva i prem Continuar reserva.
+   Si la clau sk_test_... és correcta, s'obrirà Stripe Checkout.
+
+4. Després d'un pagament de prova correcte, Stripe torna a /reserves.html.
+   L'app comprova la sessió directament amb Stripe i marca:
+   paymentStatus = pagat
+   status = Confirmada
+
+5. Per Render, la clau NO s'ha de pujar en .env:
+   s'ha d'afegir com Environment Variable amb nom STRIPE_SECRET_KEY.
+
+NOTA BIZUM:
+Stripe Checkout mostrarà els mètodes de pagament compatibles que tinguis activats al Dashboard.

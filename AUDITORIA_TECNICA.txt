@@ -1,0 +1,38 @@
+CASA MESTRES · APP CONSOLIDADA · AUDITORIA TÈCNICA
+
+ESTRUCTURA INCORPORADA
+- Configuració: empresa, logotip, dades fiscals, GPS, documents comercials i backups.
+- Magatzem: proveïdors, productes i OCR directe.
+- Cuina: bases de cuina i fitxes de plats amb cost/escandall incorporat.
+- Control de Qualitat: eina Control Normatiu completa i dades inicials vinculades.
+- RRHH: empleats, horaris i fitxatges GPS.
+
+FUNCIONS EXCLOSES EXPRESSAMENT
+- Tasques.
+- Notes de veu.
+- Mise en place.
+- Compres automàtiques.
+- Comptabilitat d'albarans.
+- Mòdul separat d'escandalls.
+
+COMPROVACIONS EXECUTADES
+- Sintaxi de server.js: correcta.
+- Sintaxi de public/app.js: correcta.
+- Sintaxi dels scripts d'ocr.html, fitxatges.html i control_normatiu.html: correcta.
+- Arrencada del servidor local i /api/health: correcta.
+- Lectura de data.json: correcta.
+- Estructura de dades: empresa, proveïdors, productes, bases, plats, documents, empleats, horaris, fitxatges i Control Normatiu.
+- Productes inicials consolidats: 31.
+- Proveïdors inicials: 1.
+- Bases inicials: 1.
+- Plats inicials: 1.
+- Empleats inicials: 1.
+- Zones inicials de Control Normatiu: 7.
+- Prova API OCR/productes: creació d'un producte temporal i generació automàtica PEI-009 correcta; dades restaurades després de la prova.
+- Prova API fitxatge GPS: codi 001, punt central, estat DINS DE ZONA i distància 0 m; dades restaurades després de la prova.
+- Prova de guardat complet i descàrrega de backup: correcta; dades restaurades després de la prova.
+- Motor Tesseract local: fitxers JS, nucli LSTM i idioma castellà accessibles des del servidor.
+- Control Normatiu: sincronització preparada amb la base única mitjançant /api/control-state.
+
+LÍMIT DE LA VALIDACIÓ
+L'entorn de construcció bloqueja l'obertura de pàgines locals en Chromium per política de l'organització. Per això no s'afirma una auditoria visual completa de tots els clics. El paquet s'ha de provar localment al PC abans de publicar-lo. No s'ha pujat a GitHub, Render ni PWA.

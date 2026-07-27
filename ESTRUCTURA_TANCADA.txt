@@ -1,0 +1,26 @@
+CASA MESTRES · ESTRUCTURA TANCADA
+
+1. CONFIGURACIÓ
+- Crear empresa i dades fiscals.
+- Logotip.
+- GPS.
+- Crear cartes, menús, pressupostos i propostes de grup amb disseny incorporat.
+- Còpia completa i restauració.
+
+2. MAGATZEM
+- Proveïdors.
+- Productes: codi, nom, preu, unitat, família, stock i ubicació.
+- OCR: llegir, revisar i crear/actualitzar productes.
+
+3. CUINA
+- Bases de cuina.
+- Fitxes de plats.
+- La fitxa del plat incorpora ingredients, bases, cost i escandall.
+
+4. CONTROL DE QUALITAT
+- Control Normatiu existent: APPCC, zones, neteja, temperatures, incidències, PRL, EPIs, formació, impressió i exportació.
+
+5. RRHH
+- Empleats.
+- Horaris.
+- Registre GPS de fitxatges: ENTRADA, PAUSA, TORNAR i SORTIDA.
